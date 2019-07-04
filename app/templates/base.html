@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="jiabaili">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>{% block title %}{% endblock %}</title>
+    <!--common-->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style-responsive.css') }}" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="{{ url_for('static', filename='js/html5shiv.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/respond.min.js') }}"></script>
+    <![endif]-->
+    {% endblock %}
+</head>
+
+<body class="sticky-header">
+{% block body %}
+<section>
+    <!-- left side start-->
+    <div class="left-side sticky-left-side">
+
+        <!--logo and iconic logo start-->
+        <div class="logo">
+            <a href="{{ url_for('.admin') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt=""></a>
+        </div>
+
+        <div class="logo-icon text-center">
+            <a href="{{ url_for('.admin') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt=""></a>
+        </div>
+        <!--logo and iconic logo end-->
+
+        <div class="left-side-inner">
+
+            <!-- visible to small devices only -->
+            <div class="visible-xs hidden-sm hidden-md hidden-lg">
+                <div class="media logged-user">
+                    <div class="media-body">
+                        <h4><a href="#">{{ user['username'] }}</a></h4>
+
+                    </div>
+                </div>
+
+                <h5 class="left-nav-title">账户信息</h5>
+                <ul class="nav nav-pills nav-stacked custom-nav">
+                  <li><a href="#"><span>个人信息</span></a></li>
+                  <li><a href="#"><span>设置</span></a></li>
+                  <li><a href="#"><span>退出登录</span></a></li>
+                </ul>
+            </div>
+            {% block sidebar %}
+            <!--sidebar nav start-->
+            <ul class="nav nav-pills nav-stacked custom-nav">
+                {% block admin %}
+                <li><a href="{{ url_for('.admin') }}"><span>首页</span></a></li>
+                {% endblock %}
+                {% if user['id'] == 1 %}
+                {% block usermanage %}
+                <li class="menu-list"><a href=""><span>用户管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block userlist %}
+                        <li><a href="{{ url_for('.userlist') }}"> 用户列表</a></li>
+                        {% endblock %}
+                        {% block rolelist %}
+                        <li><a href="{{ url_for('.rolelist') }}"> 角色列表</a></li>
+                        {% endblock %}
+                        {% block addrole %}
+                        <li><a href="{{ url_for('.addrole') }}"> 新增角色</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% endif%}
+                {% block projectmanage %}
+                <li class="menu-list"><a href=""><span>项目管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block projectlist %}
+                        <li><a href="{{ url_for('.projectlist') }}"> 项目列表</a></li>
+                        {% endblock %}
+                        {% block addproject %}
+                        <li><a href="{{ url_for('.addproject') }}"> 新增项目</a></li>
+                        {% endblock %}
+                        {% block modulelist %}
+                        <li><a href="{{ url_for('.modulelist') }}"> 项目模块</a></li>
+                        {% endblock %}
+                        {% block addmodule %}
+                        <li><a href="{{ url_for('.addmodule') }}"> 新增项目模块</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% block apimanage %}
+                <li class="menu-list"><a href=""><span>接口管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block apilist %}
+                        <li><a href="{{ url_for('.apilist') }}"> 接口列表</a></li>
+                        {% endblock %}
+                        {% block addapi %}
+                        <li><a href="{{ url_for('.addapi') }}"> 新增接口</a></li>
+                        {% endblock %}
+                        {% block versionlist %}
+                        <li><a href="{{ url_for('.versionlist') }}"> 接口版本列表</a></li>
+                        {% endblock %}
+                        {% block addversion %}
+                        <li><a href="{{ url_for('.addversion') }}"> 新增接口版本</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% block casemanage %}
+                <li class="menu-list"><a href=""><span>用例管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block caselist %}
+                        <li><a href="{{ url_for('.caselist') }}"> 用例列表</a></li>
+                        {% endblock %}
+                        {% block addcase %}
+                        <li><a href="{{ url_for('.addcase') }}"> 添加用例</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% block testplanmanage %}
+                <li class="menu-list"><a href=""><span>测试计划管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block testplanlist %}
+                        <li><a href="{{ url_for('.testplanlist') }}"> 测试计划列表</a></li>
+                        {% endblock %}
+                        {% block addtestplan %}
+                        <li><a href="{{ url_for('.addtestplan') }}"> 新增测试计划</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% block testresultmanage %}
+                <li class="menu-list"><a href=""><span>测试结果管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block testresultlist %}
+                        <li><a href="{{ url_for('.testresultlist') }}"> 测试结果列表</a></li>
+                        {% endblock %}
+                        {% block testplanreport %}
+                        <li><a href="{{ url_for('.testplanreportlist') }}"> 测试计划执行报告</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+                {% block testcasemanage %}
+                <li class="menu-list"><a href=""><span>功能测试用例管理</span></a>
+                {% endblock %}
+                    <ul class="sub-menu-list">
+                        {% block testcaselist %}
+                        <li><a href="{{ url_for('.testcaselist') }}"> 测试用例列表</a></li>
+                        {% endblock %}
+                        {% block addtestcase %}
+                        <li><a href="{{ url_for('.addtestcase') }}"> 添加测试用例</a></li>
+                        {% endblock %}
+                        {% block uploadtestcase %}
+                        <li><a href="{{ url_for('.uploadtestcase') }}"> 上传测试用例</a></li>
+                        {% endblock %}
+                        {% block downloadtestcase %}
+                        <li><a href="{{ url_for('.downloadtestcase') }}"> 下载测试用例</a></li>
+                        {% endblock %}
+                        {% block testcaseproject %}
+                        <li><a href="{{ url_for('.testcaseprojectlist') }}"> 测试项目列表</a></li>
+                        {% endblock %}
+                        {% block addtestcaseproject %}
+                        <li><a href="{{ url_for('.addtestcaseproject') }}"> 添加测试项目</a></li>
+                        {% endblock %}
+                        {% block testcasemodule %}
+                        <li><a href="{{ url_for('.testcasemodulelist') }}"> 测试用例模块</a></li>
+                        {% endblock %}
+                        {% block addtestcasemodule %}
+                        <li><a href="{{ url_for('.addtestcasemodule') }}"> 添加测试用例模块</a></li>
+                        {% endblock %}
+                        {% block testcasesubmodule %}
+                        <li><a href="{{ url_for('.testcasesubmodulelist') }}"> 测试用例子模块</a></li>
+                        {% endblock %}
+                        {% block addtestcasesubmodule %}
+                        <li><a href="{{ url_for('.addtestcasesubmodule') }}"> 添加测试用例子模块</a></li>
+                        {% endblock %}
+                    </ul>
+                </li>
+
+            </ul>
+            <!--sidebar nav end-->
+            {% endblock %}
+        </div>
+    </div>
+    <!-- left side end-->
+
+    <!-- main content start-->
+    <div class="main-content" >
+
+        <!-- header section start-->
+        <div class="header-section">
+
+            <!--toggle button start-->
+            <a class="toggle-btn"><i class="fa fa-bars"></i></a>
+            <!--toggle button end-->
+
+            <!--search start-->
+            <!--<form class="searchform" action="{{ url_for('.admin') }}" method="post">-->
+                <!--<input type="text" class="form-control" name="keyword" placeholder="搜索" />-->
+            <!--</form>-->
+            <!--search end-->
+
+            <!--notification menu start -->
+            <div class="menu-right">
+                <ul class="notification-menu">
+                    <!--<li>-->
+                        <!--<a href="#" class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown">-->
+                            <!--<i class="fa fa-bell-o"></i>-->
+                            <!--<span class="badge">1</span>-->
+                        <!--</a>-->
+                        <!--<div class="dropdown-menu dropdown-menu-head pull-right">-->
+                            <!--<h5 class="title">消息通知</h5>-->
+                            <!--<ul class="dropdown-list normal-list">-->
+                                <!--<li class="new">-->
+                                    <!--<a href="">-->
+                                        <!--<span class="label label-danger"><i class="fa fa-bolt"></i></span>-->
+                                        <!--<span class="name">XXXXXXX接口修改完成 </span>-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <!--<li class="new"><a href="">查看所有消息</a></li>-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</li>-->
+                    <li>
+                        <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            {{ user['username'] }}
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
+                            <!--<li><a href="#">个人信息</a></li>-->
+                            <!--<li><a href="#">设置</a></li>-->
+                            <li><a href="{{ url_for('.logout') }}">退出登录</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+            <!--notification menu end -->
+
+        </div>
+        <!-- header section end-->
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            {% block bread %}{% endblock %}
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+            {% block wrapper %}{% endblock %}
+        </div>
+        <!--body wrapper end-->
+
+        <!--footer section start-->
+        <footer>
+            2018 &copy; 车行168 | chehang168.com
+        </footer>
+        <!--footer section end-->
+    </div>
+    <!-- main content end-->
+</section>
+{% block endjs %}
+<!-- Placed js at the end of the document so the pages load faster -->
+<script src="{{ url_for('static', filename='js/jquery-1.10.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-migrate-1.2.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modernizr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.nicescroll.js') }}"></script>
+
+<!--common scripts for all pages-->
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+{% endblock %}
+{% endblock %}
+</body>
+</html>

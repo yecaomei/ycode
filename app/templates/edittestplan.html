@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--icheck-->
+    <link href="{{ url_for('static', filename='js/iCheck/skins/minimal/minimal.css') }}" rel="stylesheet">
+    <!--multi-select-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery-multi-select/css/multi-select.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/bootstrap-datetimepicker/css/datetimepicker-custom.css') }}" />
+<script>
+    function selectproject() {
+        var projectname = $("#projectname").val();
+        var data = {
+            "project_id": projectname,
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selectproject')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var modulename = document.getElementById("modulename");
+                var versionname = document.getElementById("versionname");
+                var api_id = document.getElementById("api_id");
+                modulename.options.length = 0;
+                versionname.options.length = 0;
+                if (Object.keys(data["modulelist"]).length < 1) {
+                    modulename.add(new Option("请选择包含模块", ''));
+                } else {
+                    modulename.add(new Option("全部模块", 0));
+                    for (var key in data["modulelist"]) {
+                        modulename.add(new Option(data["modulelist"][key], key));
+                    }
+                }
+                if (Object.keys(data["versionlist"]).length < 1) {
+                    versionname.add(new Option("请选择包含版本", ''));
+                } else {
+                    versionname.add(new Option("全部版本", 0));
+                    versionlist = data["versionlist"];
+                    var len = versionlist.length;
+                    for (var i=0; i<len; i++) {
+                        versionname.add(new Option(versionlist[i]['versionname'],versionlist[i]['id']));
+                    }
+                }
+                api_id.options.length = 0;
+//                    api_id.add(new Option("请选择包含接口", 0));
+                $('#api_id').multiSelect('refresh');
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function selectmodule() {
+        var projectname = $("#projectname").val();
+        var modulename = $("#modulename").val();
+        var versionname = $("#versionname").val();
+        //            if (document.getElementById("modulename").options[0].selected) {
+        //                document.getElementById("modulename").options[0].selected = false;
+        //                for (var i = 1; i < document.getElementById("modulename").length; i++) {
+        //                    document.getElementById("modulename").options[i].selected = true;
+        //                }
+        //                modulename = $("#modulename").val();
+        //            }
+        var data = {
+            "project_id": projectname,
+            "module_id": modulename,
+            "version_id": versionname
+        }
+        if (document.getElementById("modulename").options[0].selected && modulename.length >= 2) {
+            alert("选择了全部，请勿选择单个模块");
+            document.getElementById("modulename").options[0].selected = false;
+            selectmodule();
+            return true;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selectmodule')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var api_id = document.getElementById("api_id");
+                api_id.options.length = 0;
+                //                    api_id.add(new Option("全部接口", 0));
+                for (var key in data) {
+                    api_id.add(new Option("接口ID(" + key + ")---" + data[key], key));
+                }
+                $('#api_id').multiSelect('refresh');
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function selectversion() {
+        var projectname = $("#projectname").val();
+        var modulename = $("#modulename").val();
+        var versionname = $("#versionname").val();
+        var data = {
+            "project_id": projectname,
+            "module_id": modulename,
+            "version_id": versionname
+        }
+        if (document.getElementById("versionname").options[0].selected && versionname.length >= 2) {
+            alert("选择了全部，请勿选择单个版本");
+            document.getElementById("versionname").options[0].selected = false;
+            selectversion();
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selectversion')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var api_id = document.getElementById("api_id");
+                api_id.options.length = 0;
+                //                    api_id.add(new Option("全部接口", 0));
+                for (var key in data) {
+                    api_id.add(new Option("接口ID(" + key + ")---" + data[key], key));
+                }
+                $('#api_id').multiSelect('refresh');
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+</script>
+{% endblock %}
+{% block title %}编辑测试计划{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testplanmanage %}
+    <li class="menu-list nav-active"><a href=""><span>测试计划管理</span></a>
+{% endblock %}
+{% block testplanlist %}
+    <li class="active"><a href="{{ url_for('.testplanlist') }}">测试计划列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>编辑测试计划</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">测试计划管理</a>
+        </li>
+        <li>
+            <a href="{{ url_for('.testplanlist') }}">测试计划列表</a>
+        </li>
+        <li class="active">编辑测试计划</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">编辑测试计划</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+            <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+            {% endfor %}
+                <form id="signupForm" class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.planname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.planname() }}
+                            {% for err in form.errors.planname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.projectname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.projectname() }}
+                            {% for err in form.errors.projectname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.modulename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.modulename() }}
+                            {% for err in form.errors.modulename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.versionname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.versionname() }}
+                            {% for err in form.errors.versionname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.api_id.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.api_id() }}
+                            {% for err in form.errors.api_id %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.appointmentTime.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-md-4">
+                            {{ form.appointmentTime() }}
+                            {% for err in form.errors.appointmentTime %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.note.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.note() }}
+                            {% for err in form.errors.note %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-5 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--icheck -->
+    <script src="{{ url_for('static', filename='js/iCheck/jquery.icheck.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icheck-init.js') }}"></script>
+    <!--multi-select-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.multi-select.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.quicksearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/multi-select-init.js') }}"></script>
+    <!--pickers plugins-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+
+    <!--pickers initialization-->
+    <script src="{{ url_for('static', filename='js/pickers-init.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/jsonformat.js') }}"></script>
+{% endblock %}

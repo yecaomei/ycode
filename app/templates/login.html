@@ -1,0 +1,68 @@
+{% extends "frontbase.html" %}
+{% block title %}登录页面{% endblock %}
+{% block body %}
+{{ super() }}
+<div class="container">
+
+    <form id="signupForm" class="form-signin" action="{{ url_for('.login') }}" method="post">
+        <div class="form-signin-heading text-center">
+            <h1 class="sign-title">登录</h1>
+            <img src="{{ url_for('static', filename='images/logo_header.gif') }}" alt=""/>
+        </div>
+        <div class="login-wrap">
+            {% for msg in get_flashed_messages() %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {{ form.email() }}
+            {% for err in form.errors.email %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            {{ form.password() }}
+            {% for err in form.errors.password %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            <button class="btn btn-lg btn-login btn-block" type="submit" formnovalidate>
+                <i class="fa fa-check"></i>
+            </button>
+            {{ form.csrf_token }}
+            <div class="registration">
+                不是用户请<a class="" href="{{ url_for('.registration') }}">注册</a>
+            </div>
+            <label class="checkbox">
+                {{ form.remember() }}{{ form.remember.label }}
+                <span class="pull-right">
+                    <a data-toggle="modal" href="#myModal">忘记密码</a>
+                </span>
+            </label>
+        </div>
+    </form>
+        <!-- Modal -->
+        <form class="form-horizontal" action="{{ url_for('.resetpwd') }}" method="post">
+            <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">忘记密码?</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p> 请输入您的电子邮件地址来重置密码。 </p>
+                            {{ form2.useremail() }}
+                            {% for err in form2.errors.useremail %}
+                            <label style="color: #FF6C60;">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                            <button class="btn btn-primary" type="submit" formnovalidate>确定</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- modal -->
+
+
+
+</div>
+{% endblock %}

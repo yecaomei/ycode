@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--icheck-->
+    <link href="{{ url_for('static', filename='js/iCheck/skins/minimal/minimal.css') }}" rel="stylesheet">
+    <!--multi-select-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery-multi-select/css/multi-select.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/bootstrap-datetimepicker/css/datetimepicker-custom.css') }}" />
+{% endblock %}
+{% block title %}编辑项目{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block projectmanage %}
+    <li class="menu-list nav-active"><a href=""><span>项目管理</span></a>
+{% endblock %}
+{% block projectlist %}
+    <li class="active"><a href="{{ url_for('.projectlist') }}"> 项目列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>编辑项目</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">项目管理</a>
+        </li>
+        <li>编辑项目</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">编辑项目</header>
+            <div class="panel-body">
+                 {% for msg in get_flashed_messages() %}
+                    <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+                {% endfor %}
+                <form id="signupForm" class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.projectname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.projectname() }}
+                            {% for err in form.errors.projectname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.role_id.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-10 icheck">
+                            <div class="minimal single-row">
+                                {{ form.role_id() }}
+                            </div>
+                            {% for err in form.errors.role_id %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.users.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.users() }}
+                            {% for err in form.errors.users %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.note.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.note() }}
+                            {% for err in form.errors.note %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+
+    <!--icheck -->
+    <script src="{{ url_for('static', filename='js/iCheck/jquery.icheck.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icheck-init.js') }}"></script>
+    <!--multi-select-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.multi-select.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.quicksearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/multi-select-init2.js') }}"></script>
+{% endblock %}

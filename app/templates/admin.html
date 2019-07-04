@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block admin %}
+    <li class="active"><a href="{{ url_for('.admin') }}"><span>首页</span></a></li>
+{% endblock %}
+{% block bread %}
+    <h3>我的首页</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="{{ url_for('.admin') }}">首页</a>
+        </li>
+        <li class="active"> 我的首页 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<h3>欢迎 {{ user['username'] }} 登录</h3>
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">个人信息</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+                    <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+                {% endfor %}
+                <div class="adv-table">
+                    <div class="profile-pic text-center" style="float: left; width: 300px;">
+                        {% if user.images %}
+                            <img alt="" src="{{ url_for('static', filename=user.images) }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/photos/noimage.png') }}" alt="" />
+                        {% endif %}
+                    </div>
+                    <ul class="p-info" style="width: 400px; float: left;">
+                        <li>
+                            <div class="title">用户名</div>
+                            <div class="desk">{{ user.username }}</div>
+                        </li>
+                        <li>
+                            <div class="title">邮箱</div>
+                            <div class="desk">{{ user.email }}</div>
+                        </li>
+                        <li>
+                            <div class="title">手机号</div>
+                            <div class="desk">{% if user.telephone %}{{ user.telephone }}{%else%}暂无{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">角色权限</div>
+                            <div class="desk">{% if user.role_id %}{{ getrole(user.role_id) }}{%else%}暂无{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">生效状态</div>
+                            <div class="desk">{% if user.status == 1 %}正常{% else %}无效{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">注册时间</div>
+                            <div class="desk">{{ user.regtime }}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后修改时间</div>
+                            <div class="desk">{% if user.modifytime %}{{ user.modifytime }}{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后修改人</div>
+                            <div class="desk">{% if user.lastmodifier %}{{ getusername(user.lastmodifier) }}{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后登录时间</div>
+                            <div class="desk">{% if user.lastlogin %}{{ user.lastlogin }}{% endif %}</div>
+                        </li>
+                        <li>
+                            <form id="signupForm" class="form-signin" action="" method="post">
+                                <div class="title">修改密码</div>
+                                {{ form.password() }}
+                                {% for err in form.errors.password %}
+                                    <label class="error">{{ err }}</label>
+                                {% endfor %}
+                                <div class="form-group">
+                                    <div class="col-lg-offset-3 col-lg-10">
+                                        <button class="btn btn-primary" type="submit" formnovalidate>修改</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+    <script>
+        function edittestcasestatus(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '测试用例的状态改为' + t + ' 吗？')) {
+                var data = {
+                    "id":id,
+                    "status":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.edittestcasestatus')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+
+    </script>
+{% endblock %}
+{% block title %}测试用例列表{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testcasemanage %}
+    <li class="menu-list nav-active"><a href=""><span>功能测试用例管理</span></a>
+{% endblock %}
+{% block testcaselist %}
+    <li class="active"><a href="{{ url_for('.testcaselist') }}"> 测试用例列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>测试用例列表</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">功能测试用例管理</a>
+        </li>
+        <li class="active"> 测试用例列表 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+        <div class="col-sm-12">
+        <section class="panel">
+        <header class="panel-heading">测试用例列表</header>
+        <div class="panel-body">
+        <div class="adv-table">
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>用例ID</th>
+            <th>测试项目</th>
+            <th>测试模块</th>
+            <th>测试子模块</th>
+            <th>用例序号</th>
+            <th>测试用例标题</th>
+            <th>用例状态</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+            <th hidden>前置条件</th>
+            <th hidden>操作步骤</th>
+            <th hidden>页面逻辑结果</th>
+            <th hidden>数据库结果</th>
+            <th hidden>用例级别</th>
+            <th hidden>所属版本</th>
+            <th hidden>用例描述</th>
+            <th hidden>创建时间</th>
+            <th hidden>最后修改人</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for testcase in testcaselist%}
+        <tr class="gradeA">
+            <td class="testcaseid">{{ testcase.id }}</td>
+            <td>{{ testcase.testcasesubmodule.testcasemodule.testcaseproject.projectname }}</td>
+            <td>{{ testcase.testcasesubmodule.testcasemodule.modulename }}</td>
+            <td>{{ testcase.testcasesubmodule.submodulename }}--({{ testcase.testcasesubmodule.id }})</td>
+            <td>{{ testcase.caseNo }}</td>
+            <td>{{ testcase.testcasename }}</td>
+            <td class="center">
+                <select class="form-control  m-bot15" onchange="edittestcasestatus($(this).val(), $(this).find('option:selected').text(),$(this).parent().siblings('.testcaseid').text())">
+                    <option value="0" {% if testcase.status == 0 %} selected {% endif %}>无效</option>
+                    <option value="1" {% if testcase.status == 1 %} selected {% endif %}>正常</option>
+                </select>
+            </td>
+            <td>{% if testcase.modifytime %}{{ testcase.modifytime }}{% endif %}</td>
+            <td><a href="{{url_for('.edittestcase', id=testcase.id)}}">编辑</a>
+            &nbsp;&nbsp;/&nbsp;&nbsp;<a href="{{url_for('.copytestcase', id=testcase.id)}}">复制测试用例</a>
+            </td>
+            <td hidden><div style="white-space: pre">{{ testcase.precondition }}</div></td>
+            <td hidden><div style="white-space: pre">{{ testcase.steps }}</div></td>
+            <td hidden><div style="white-space: pre">{{ testcase.logicalresult }}</div></td>
+            <td hidden><div style="white-space: pre">{{ testcase.databaseresult }}</div></td>
+            <td hidden>{{ testcase.priority }}</td>
+            <td hidden>{{ testcase.version }}</td>
+            <td hidden><div style="white-space: pre">{{ testcase.note }}</div></td>
+            <td hidden>{{ testcase.createtime }}</td>
+            <td hidden>{% if testcase.lastmodifier %}{{ testcase.user.username }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+        </section>
+        </div>
+        </div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/testcaselist.js') }}"></script>
+{% endblock %}

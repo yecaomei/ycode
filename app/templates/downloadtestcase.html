@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--icheck-->
+    <link href="{{ url_for('static', filename='js/iCheck/skins/minimal/minimal.css') }}" rel="stylesheet">
+    <!--multi-select-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery-multi-select/css/multi-select.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/bootstrap-datetimepicker/css/datetimepicker-custom.css') }}" />
+<script>
+    function selectproject() {
+        var projectname = $("#projectname").val();
+        var data = {
+            "project_id": projectname,
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selecttestcaseproject')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var modulename = document.getElementById("modulename");
+                var submodulename = document.getElementById("submodulename");
+                modulename.options.length = 0;
+                if (Object.keys(data["modulelist"]).length < 1) {
+                    modulename.add(new Option("请选择测试用例模块", ''));
+                } else {
+                    modulename.add(new Option("全部模块", 0));
+                    for (var key in data["modulelist"]) {
+                        modulename.add(new Option(data["modulelist"][key], key));
+                    }
+                }
+                submodulename.options.length = 0;
+                $('#submodulename').multiSelect('refresh');
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function selectmodule() {
+        var projectname = $("#projectname").val();
+        var modulename = $("#modulename").val();
+        var data = {
+            "project_id": projectname,
+            "module_id": modulename,
+        }
+        if (document.getElementById("modulename").options[0].selected && modulename.length >= 2) {
+            alert("选择了全部，请勿选择单个模块");
+            document.getElementById("modulename").options[0].selected = false;
+            selectmodule();
+            return true;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selecttestcasemodules')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var submodulename = document.getElementById("submodulename");
+                submodulename.options.length = 0;
+                for (var key in data) {
+                    submodulename.add(new Option("子模块ID(" + key + ")---" + data[key], key));
+                }
+                $('#submodulename').multiSelect('refresh');
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+
+</script>
+{% endblock %}
+{% block title %}下载测试用例{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testcasemanage %}
+    <li class="menu-list nav-active"><a href=""><span>功能测试用例管理</span></a>
+{% endblock %}
+{% block downloadtestcase %}
+    <li class="active"><a href="{{ url_for('.downloadtestcase') }}">下载测试用例</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>下载测试用例</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">功能测试用例管理</a>
+        </li>
+        <li class="active">下载测试用例</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">下载测试用例</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+                    <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+                {% endfor %}
+                <form id="signupForm" class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.projectname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.projectname() }}
+                            {% for err in form.errors.projectname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.modulename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.modulename() }}
+                            {% for err in form.errors.modulename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.submodulename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.submodulename() }}
+                            {% for err in form.errors.submodulename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-offset-5 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--icheck -->
+    <script src="{{ url_for('static', filename='js/iCheck/jquery.icheck.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icheck-init.js') }}"></script>
+    <!--multi-select-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.multi-select.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-multi-select/js/jquery.quicksearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/multi-select-init-testcase.js') }}"></script>
+    <!--pickers plugins-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+
+    <!--pickers initialization-->
+    <script src="{{ url_for('static', filename='js/pickers-init.js') }}"></script>
+{% endblock %}

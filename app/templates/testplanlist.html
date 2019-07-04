@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+    <script>
+        function exetestplan(id) {
+            if (confirm('您确定要执行ID：' + id + '测试计划吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.exetestplan')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function editsendemail(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '测试计划改为' + t + '邮件吗？')) {
+                var data = {
+                    "id":id,
+                    "sendemail":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.editsendemail')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}
+{% block title %}测试计划列表{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testplanmanage %}
+    <li class="menu-list nav-active"><a href=""><span>测试计划管理</span></a>
+{% endblock %}
+{% block testplanlist %}
+    <li class="active"><a href="{{ url_for('.testplanlist') }}"> 测试计划列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>测试计划列表</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">测试计划管理</a>
+        </li>
+        <li class="active"> 测试计划列表 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+        <div class="col-sm-12">
+        <section class="panel">
+        <header class="panel-heading">测试计划列表</header>
+        <div class="panel-body">
+        <div class="adv-table">
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>测试计划ID</th>
+            <th>所属项目</th>
+            <th>测试计划名称</th>
+            <th>预定执行时间</th>
+            <th>实际执行时间</th>
+            <th>执行时长</th>
+            <th>最近执行批次</th>
+            <th>状态</th>
+            <th>最后执行人</th>
+            <th>是否发送报告邮件</th>
+            <th>操作</th>
+            <th hidden>包含模块</th>
+            <th hidden>包含版本</th>
+            <th hidden>包含接口</th>
+            <th hidden>测试计划描述</th>
+            <th hidden>创建时间</th>
+            <th hidden>修改时间</th>
+            <th hidden>最后修改人</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for testplan in testplanlist%}
+        <tr class="gradeA">
+            <td class="testplanid">{{ testplan[0].id }}</td>
+            <td>{{ testplan[2].projectname }}</td>
+            <td>{{ testplan[0].planname }}</td>
+            <td>{{ testplan[0].appointmentTime }}</td>
+            <td>{% if testplan[0].actualTime %}{{ testplan[0].actualTime }}{% endif %}</td>
+            <td>{% if testplan[0].exetime %}{{ testplan[0].exetime }}{% endif %}</td>
+            <td>{% if testplan[0].batchnumber %}{{ testplan[0].batchnumber }}{% endif %}</td>
+            <td>{% if testplan[0].status == 'finished' %}
+                    <button class="btn btn-info" disabled="disabled" type="button" style="width: auto;height: auto;padding:6px 8px;">{{ testplanstatus[testplan[0].status] }}</button>
+                {% elif testplan[0].status == 'executing' %}
+                    <button class="btn btn-success" disabled="disabled" type="button" style="width: auto;height: auto;padding:6px 8px;">{{ testplanstatus[testplan[0].status] }}</button>
+                {% elif testplan[0].status == 'failed' %}
+                    <button class="btn btn-danger" disabled="disabled" type="button" style="width: auto;height: auto;padding:6px 8px;">{{ testplanstatus[testplan[0].status] }}</button>
+                {% else %}
+                    <button class="btn btn-primary" disabled="disabled" type="button" style="width: auto;height: auto;padding:6px 8px;">{{ testplanstatus[testplan[0].status] }}</button>
+                {% endif %}
+            </td>
+            <td>{{ testplan[0].user.username }}</td>
+            <td>
+                <select class="form-control  m-bot15" onchange="editsendemail($(this).val(), $(this).find('option:selected').text(),$(this).parent().siblings('.testplanid').text())">
+                    <option value="0" {% if testplan[0].sendemail == 0 %} selected {% endif %}>不发送</option>
+                    <option value="1" {% if testplan[0].sendemail == 1 %} selected {% endif %}>发送</option>
+                </select>
+            </td>
+            <td><a href="{{url_for('.edittestplan', id=testplan[0].id)}}">编辑</a><br>
+                <!--<button class="btn btn-info" type="button" style="width: auto;height: auto;padding:6px 8px;margin: 0px 0px 5px 0px">置为定时任务</button><br>-->
+                <button class="btn btn-info" type="button" {% if testplan[0].status == 'executing' %} disabled="disabled" {% endif %} style="width: auto;height: auto;padding:6px 8px;" onclick="exetestplan($(this).parent().siblings('.testplanid').text())">执行测试计划</button><br>
+                {% if testplan[0].batchnumber %}<a href="{{url_for('.testplanreport', batchnumber=testplan[0].batchnumber)}}">查看报告</a>{% endif %}
+            </td>
+            <td hidden>{{ modules(testplan[0].modules, testplan[2].id) }}</td>
+            <td hidden>{{ versions(testplan[0].versions, testplan[2].id) }}</td>
+            <td hidden>{{ apis(testplan[0].apis, testplan[0].modules, testplan[0].versions, testplan[0].project) }}</td>
+            <td hidden>{% if testplan[0].note %}{{ testplan[0].note }}{% endif %}</td>
+            <td hidden>{{ testplan[0].createtime }}</td>
+            <td hidden>{{ testplan[0].modifytime }}</td>
+            <td hidden>{{ testplan[1].username }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+        </section>
+        </div>
+        </div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/testplanlist.js') }}"></script>
+{% endblock %}

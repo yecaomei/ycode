@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--file upload-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-fileupload.min.css') }}" />
+{% endblock %}
+{% block title %}上传测试用例{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testcasemanage %}
+    <li class="menu-list nav-active"><a href=""><span>功能测试用例管理</span></a>
+{% endblock %}
+{% block uploadtestcase %}
+    <li class="active"><a href="{{ url_for('.uploadtestcase') }}">上传测试用例</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>上传测试用例</h3>
+    <ul class="breadcrumb">
+        <li>功能测试用例管理</li>
+        <li class="active">上传测试用例</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">上传测试用例</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+                    <div class="alert alert-info" style="text-align: left">
+                        {% for m in msg %}
+                        {{ m }}
+                        <br>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <form id="signupForm"  class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.excelfile.label(class="col-sm-2 control-label") }}
+                        <div class="col-md-9">
+                            {{ form.excelfile() }}
+                            {% for err in form.errors.excelfile %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>上传</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--file upload-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-fileupload.min.js') }}"></script>
+{% endblock %}

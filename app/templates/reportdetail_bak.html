@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="jiabaili">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>{{ testreport.batchnumber }}</title>
+    <!--common-->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style-responsive.css') }}" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="{{ url_for('static', filename='js/html5shiv.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/respond.min.js') }}"></script>
+    <![endif]-->
+
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet"/>
+</head>
+
+<body class="sticky-header">
+<div class="page-heading">
+    <h3 style="color: #65CEA7;">{{ testreport.batchnumber }}批次测试结果列表</h3>
+</div>
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <table class="display table table-bordered">
+                <thead>
+                <tr>
+                    <th>测试计划(ID)</th>
+                    <th>执行批次</th>
+                    <th>接口数量</th>
+                    <th>用例数量</th>
+                    <th>用例执行成功数</th>
+                    <th>用例执行失败数</th>
+                    <th>未执行接口数</th>
+                    <th>未执行用例数</th>
+                    <th>执行时间</th>
+                    <th>执行人</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="gradeA">
+                    <td>{{ testreport.testplan.planname }}({{ testreport.testplan_id }})</td>
+                    <td>{% if testreport.batchnumber != '0' %}{{ testreport.batchnumber }}{% endif %}</td>
+                    <td>{{ testreport.apicount }}</td>
+                    <td>{{ testreport.casecount }}</td>
+                    <td>{{ testreport.passedcount }}</td>
+                    <td>{{ testreport.failedcount }}</td>
+                    <td>{{ testreport.unexeapicount }}</td>
+                    <td>{{ testreport.unexecasecount }}</td>
+                    <td>{{ testreport.createtime }}</td>
+                    <td>{{ testreport.user.username }}</td>
+                </tr>
+                </tbody>
+                </table>
+                <table class="display table table-bordered">
+                    <tr>
+                        <td style="width: 100px;">包含接口</td>
+                        <td>
+                            {% if testreport.apis %}
+                                {% for id,name in apis(testreport.apis).items() %}
+                                    {{ name }}({{ id }})、
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>包含用例</td>
+                        <td>
+                            {% if testreport.cases %}
+                                {% for id,name in cases(testreport.cases).items() %}
+                                    {{ name }}({{ id }})、
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>未执行接口</td>
+                        <td>
+                            {% if testreport.unexeapi %}
+                                {% for id,name in apis(testreport.unexeapi).items() %}
+                                    {{ name }}({{ id }})、
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>未执行用例</td>
+                        <td>
+                            {% if testreport.unexecase %}
+                                {% for id,name in cases(testreport.unexecase).items() %}
+                                    {{ name }}({{ id }})、
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                <header class="panel-heading">测试结果列表</header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <table class="display table table-bordered" id="hidden-table-info">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>测试计划ID</th>
+                                <th>执行批次</th>
+                                <th>接口(ID)</th>
+                                <th>用例(ID)</th>
+                                <th>执行结果</th>
+                                <th>前置用例执行结果</th>
+                                <th>执行时间</th>
+                                <th>执行人</th>
+                                <th hidden>原因</th>
+                                <th hidden>请求方式</th>
+                                <th hidden>接口域名</th>
+                                <th hidden>接口地址</th>
+                                <th hidden>协议</th>
+                                <th hidden>传参方式</th>
+                                <th hidden>前置用例</th>
+                                <th hidden>请求头部</th>
+                                <th hidden>body传参</th>
+                                <th hidden>结果对比方式</th>
+                                <th hidden>期望结果</th>
+                                <th hidden>返回结果状态</th>
+                                <th hidden>返回结果头部</th>
+                                <th hidden>实际结果</th>
+                                <th hidden>用例描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for testresult in testresultlist %}
+                            <tr class="gradeA">
+                                <td class="testplanid">{{ testresult.id }}</td>
+                                <td>{% if testresult.testplan_id != 0 %}{{ testresult.testplan_id }}{% endif %}</td>
+                                <td>{% if testresult.batchnumber != '0' %}{{ testresult.batchnumber }}{% endif %}
+                                </td>
+                                <td>{{ testresult.apiname }}({{ testresult.api_id }})</td>
+                                <td>{{ testresult.case.casename }}({{ testresult.case_id }})</td>
+                                <td>{% if testresult.result ==1 %}<font color="green">成功</font>{% else %}<font
+                                        color="red">失败</font>{% endif %}
+                                </td>
+                                <td>
+                                    {% if testresult.beforeresult %}
+                                    {% for id,name in beforeresult(testresult.beforeresult).items() %}{{ name }}<br>
+                                    {% endfor %}
+                                    {% endif %}
+                                </td>
+                                <td>{{ testresult.createtime }}</td>
+                                <td>{{ testresult.user.username }}</td>
+                                <td hidden>{{ testresult.reasons }}</td>
+                                <td hidden>{{ testresult.method }}</td>
+                                <td hidden>{{ testresult.domain }}</td>
+                                <td hidden>{{ testresult.url }}</td>
+                                <td hidden>{{ testresult.protocol }}</td>
+                                <td hidden>{{ testresult.transmethod }}</td>
+                                <td hidden>{{ testresult.beforecase }}</td>
+                                <td hidden>{{ testresult.requestheaders }}</td>
+                                <td hidden>{{ testresult.jsondata }}</td>
+                                <td hidden>{{ testresult.comparemethod }}</td>
+                                <td hidden>{{ testresult.expectedResults }}</td>
+                                <td hidden>{{ testresult.status_code }}</td>
+                                <td hidden>{{ testresult.reponseheaders }}</td>
+                                <td hidden>{{ testresult.actualResults }}</td>
+                                <td hidden>{{ testresult.note }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<!--footer section start-->
+<footer>
+    2018 &copy; 车行168 | chehang168.com
+</footer>
+<!--footer section end-->
+
+<!-- Placed js at the end of the document so the pages load faster -->
+<script src="{{ url_for('static', filename='js/jquery-1.10.2.min.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>-->
+<!--<script src="{{ url_for('static', filename='js/jquery-migrate-1.2.1.min.js') }}"></script>-->
+<!--<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>-->
+<!--<script src="{{ url_for('static', filename='js/modernizr.min.js') }}"></script>-->
+<!--<script src="{{ url_for('static', filename='js/jquery.nicescroll.js') }}"></script>-->
+
+<!--common scripts for all pages-->
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<!--&lt;!&ndash;dynamic table&ndash;&gt;-->
+<script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+<!--dynamic table initialization -->
+<script src="{{ url_for('static', filename='js/testresultlist.js') }}"></script>
+</body>
+</html>

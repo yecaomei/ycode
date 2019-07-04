@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+<script>
+        function editversionstatus(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '项目版本状态改为' + t + ' 吗？')) {
+                var data = {
+                    "id":id,
+                    "status":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.editversionstatus')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}
+{% block title %}接口版本{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block apimanage %}
+    <li class="menu-list nav-active"><a href=""><span>接口管理</span></a>
+{% endblock %}
+{% block versionlist %}
+    <li class="active"><a href="{{ url_for('.versionlist') }}">接口版本列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>接口版本</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">接口管理</a>
+        </li>
+        <li class="active">接口版本</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">接口版本</header>
+            <div class="panel-body">
+                <div class="adv-table">
+                    <table class="display table table-bordered table-striped" id="dynamic-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>项目名称</th>
+                            <th>接口版本名称</th>
+                            <th>接口版本描述</th>
+                            <th>生效状态</th>
+                            <th>最后修改人</th>
+                            <th>最后修改时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for version in versionlist%}
+                        <tr class="gradeA">
+                            <td class="versionid">{{ version.id }}</td>
+                            <td>{{ version.project.projectname }}</td>
+                            <td>{{ version.versionname }}</td>
+                            <td>{{ version.note }}</td>
+                            <td class="center">
+                                <select class="form-control  m-bot15" onchange="editversionstatus($(this).val(), $(this).find('option:selected').text(),$(this).parent().siblings('.versionid').text())">
+                                    <option value="0" {% if version.status == 0 %} selected {% endif %}>无效</option>
+                                    <option value="1" {% if version.status == 1 %} selected {% endif %}>正常</option>
+                                </select>
+                            </td>
+                            <td class="center">{% if version.lastmodifier %}{{ version.user.username }}{% endif %}</td>
+                            <td class="center">{% if version.modifytime %}{{ version.modifytime }}{% endif %}</td>
+                            <td class="center"><a href="{{url_for('.editversion', id=version.id)}}">编辑</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/dynamic_table_init.js') }}"></script>
+{% endblock %}

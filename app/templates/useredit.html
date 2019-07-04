@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--file upload-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-fileupload.min.css') }}" />
+{% endblock %}
+{% block title %}编辑用户{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block usermanage %}
+    <li class="menu-list nav-active"><a href=""><span>用户管理</span></a>
+{% endblock %}
+{% block userlist %}
+    <li class="active"><a href="{{ url_for('.userlist') }}">用户列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>编辑用户</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">用户管理</a>
+        </li>
+        <li>
+            <a href="{{ url_for('.userlist') }}">用户列表</a>
+        </li>
+        <li class="active">编辑用户</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">用户详情</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+                    <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+                {% endfor %}
+                <form id="signupForm"  class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.images.label(class="col-sm-2 control-label") }}
+                        <div class="col-md-9">
+                            <div class="fileupload fileupload-new" data-provides="fileupload">
+                                <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                    {% if users_info.images %}
+                                    <img src="{{ url_for('static', filename=users_info.images) }}" alt=""/>
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='images/photos/noimage.png') }}" alt="" />
+                                    {% endif %}
+                                </div>
+                                <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                <div>
+                                   <span class="btn btn-default btn-file">
+                                   <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select image</span>
+                                   <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
+                                       {{ form.images() }}
+                                   </span>
+                                    <a href="#" class="btn btn-danger fileupload-exists" data-dismiss="fileupload"><i class="fa fa-trash"></i> Remove</a>
+                                </div>
+                            </div>
+                            {% for err in form.errors.images %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                            <br/>
+                            <span class="label label-danger ">NOTE!</span>
+                            <span>Attached image thumbnail is supported in Latest Firefox, Chrome, Opera, Safari and Internet Explorer 10 only</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.username.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.username() }}
+                            {% for err in form.errors.username %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.password.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.password() }}
+                            <label class="error">需要修改密码时，填写密码，不修改密码则为空</label>
+                            {% for err in form.errors.password %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 col-sm-2 control-label">邮箱</label>
+                        <div class="col-lg-10">
+                            <p class="form-control-static">{{ users_info.email }}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.telephone.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.telephone() }}
+                            {% for err in form.errors.telephone %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.role_id.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.role_id() }}
+                            {% for err in form.errors.role_id %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>修改</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--file upload-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-fileupload.min.js') }}"></script>
+{% endblock %}

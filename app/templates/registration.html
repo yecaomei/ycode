@@ -1,0 +1,46 @@
+{% extends "frontbase.html" %}
+{% block title %}注册页面{% endblock %}
+{% block body %}
+{{ super() }}
+<div class="container">
+
+    <form id="signupForm" class="form-signin" action="{{ url_for('.registration') }}" method="post">
+        <div class="form-signin-heading text-center">
+            <h1 class="sign-title">注册</h1>
+            <img src="{{ url_for('static', filename='images/logo_header.gif') }}" alt=""/>
+        </div>
+        <div class="login-wrap">
+            {% for msg in get_flashed_messages() %}
+            <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+            {{ form.email() }}
+            {% for err in form.errors.email %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            {{ form.username() }}
+            {% for err in form.errors.username %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            {{ form.password() }}
+            {% for err in form.errors.password %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            {{ form.repassword() }}
+            {% for err in form.errors.repassword %}
+            <label class="error">{{ err }}</label>
+            {% endfor %}
+            <button type="submit" class="btn btn-lg btn-login btn-block" formnovalidate>
+                <i class="fa fa-check"></i>
+            </button>
+            {{ form.csrf_token }}
+            <div class="registration">
+                已注册
+                <a href="{{ url_for('.login') }}" class="">登录</a>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

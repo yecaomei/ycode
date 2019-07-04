@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+    <script>
+        function editcasestatus(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '用例的状态改为' + t + ' 吗？')) {
+                var data = {
+                    "id":id,
+                    "status":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.editcasestatus')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function lockcase(id) {
+            if (confirm('您确定要把ID：' + id + '用例锁定吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.lockcase')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function unlockcase(id) {
+            if (confirm('您确定要把ID：' + id + '用例解锁吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.unlockcase')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function singleexe(id) {
+            if (confirm('您确定要执行ID：' + id + '测试用例吗？')) {
+                var data = {
+                    "id":id
+                }
+                var times = prompt("请输入需执行的次数", "1");
+                var reg=/^[1-9]+[0-9]*]*$/;
+                if (!reg.test(times)) {
+                    alert("请输入正确的执行次数");
+                    return false;
+                }
+                for (var i = 0; i < times; i++) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{url_for('.singleexe')}}",
+                        data: JSON.stringify(data),
+                        contentType: 'application/json; charset=UTF-8',
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data)
+                            //                        location.reload();
+                            var result = document.getElementById("result");
+                            if (data['result'] == 1) {
+                                result.innerHTML = "<font color='#65CEA7'>执行成功</font>";
+                            }
+                            if (data['result'] == 0) {
+                                result.innerHTML = "<font color='#d2322d'>执行失败</font>";
+                            }
+                            var reasons = document.getElementById("reasons");
+                            if (data['reasons'] != "") {
+                                reasons.innerHTML = "原因：" + data['reasons'];
+                            }
+                            var jsondata = document.getElementById("jsondata");
+                            jsondata.value = data["jsondata"];
+                            var expectedResults = document.getElementById("expectedResults");
+                            expectedResults.value = data["expectedResults"];
+                            var actualResults = document.getElementById("actualResults");
+                            actualResults.value = data["actualResults"];
+                            $('.pull-right a').trigger('click')
+
+                        },
+                        error: function (xhr, type) {
+                        }
+                    });
+                }
+            }
+        }
+
+    </script>
+{% endblock %}
+{% block title %}用例列表{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block casemanage %}
+    <li class="menu-list nav-active"><a href=""><span>用例管理</span></a>
+{% endblock %}
+{% block caselist %}
+    <li class="active"><a href="{{ url_for('.caselist') }}"> 用例列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>用例列表</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">用例管理</a>
+        </li>
+        <li class="active"> 用例列表 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+        <div class="col-sm-12">
+        <section class="panel">
+        <header class="panel-heading">用例列表
+        <div style="float:right">
+                <span class="pull-right">
+                    <a data-toggle="modal" href="#myModal">不刷新页面，查看最新执行结果</a>
+                </span>
+            </div>
+        </header>
+        <div class="panel-body">
+        <div class="adv-table">
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>用例ID</th>
+            <th>所属项目</th>
+            <th>所属模块</th>
+            <th>所属版本</th>
+            <th>接口名称</th>
+            <th>接口来源/地址</th>
+            <th>用例名称</th>
+            <th>用例状态</th>
+            <th>锁定状态/锁定人</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+            <th hidden>接口ID</th>
+            <th hidden>请求方式</th>
+            <th hidden>接口协议</th>
+            <th hidden>接口状态</th>
+            <th hidden>接口锁定状态/锁定人</th>
+            <th hidden>传参方式</th>
+            <th hidden>前置用例及其获取的参数</th>
+            <th hidden>body传参</th>
+            <th hidden>结果对比方式</th>
+            <th hidden>期望结果</th>
+            <th hidden>用例描述</th>
+            <th hidden>创建时间</th>
+            <th hidden>最后修改人</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for case in caselist%}
+        <tr class="gradeA">
+            <td class="caseid">{{ case[0].id }}</td>
+            <td>{{ case[0].api.module.project.projectname }}</td>
+            <td>{{ case[0].api.module.modulename }}</td>
+            <td>{{ case[0].api.version.versionname }}</td>
+            <td>{{ case[0].api.apiname }}</td>
+            <td>{{ company[case[0].api.domain] }}<br>{{ case[0].api.url }}</td>
+            <td>{{ case[0].casename }}</td>
+            <td>
+                <select class="form-control  m-bot15" onchange="editcasestatus($(this).val(), $(this).find('option:selected').text(),$(this).parent().siblings('.caseid').text())">
+                    {% for k,v in casestatus.items()%}
+                    <option value="{{ k }}" {% if k== case[0].status %} selected {% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>{% if case[0].locked== 0 %} 未锁定 <br><button class="btn btn-info" type="button" style="width: auto;height: auto;padding:6px 12px;" onclick="lockcase($(this).parent().siblings('.caseid').text())">锁定</button>{% else %} 已锁定 / {{ case[0].user.username }}{% endif %}{% if case[0].locked == 1 and case[0].locker== user.id %}<button class="btn btn-success" type="button" style="width: auto;height: auto;padding:6px 12px;" onclick="unlockcase($(this).parent().siblings('.caseid').text())">解锁</button>{% endif %}</td>
+            <td>{{ case[0].modifytime }}</td>
+            <td><button class="btn btn-danger" type="button" style="width: auto;height: auto;padding:6px 8px;" onclick="singleexe($(this).parent().siblings('.caseid').text())">执行用例</button><br><a href="{{url_for('.editcase', id=case[0].id)}}">编辑</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a href="{{url_for('.copycase', id=case[0].id)}}">复制</a></td>
+            <td hidden>{{ case[0].api.id }}</td>
+            <td hidden>{{ case[0].api.method }}</td>
+            <td hidden>{{ case[0].api.protocol }}</td>
+            <td hidden>{{ apistatus[case[0].api.status] }}</td>
+            <td hidden>{% if case[0].api.locked== 0 %} 未锁定 {% else %} 已锁定 / {{ case[0].api.user.username }}{% endif %}</td>
+            <td hidden>{{ case[0].api.transmethod }}</td>
+            <td hidden>{{ case[0].beforecase }}</td>
+            <td hidden>{{ case[0].jsondata }}</td>
+            <td hidden>{{ comparemethod[case[0].comparemethod] }}</td>
+            <td hidden>{{ case[0].expectedResults }}</td>
+            <td hidden>{{ case[0].note }}</td>
+            <td hidden>{{ case[0].createtime }}</td>
+            <td hidden>{{ case[1].username }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+        </section>
+        </div>
+        </div>
+
+        <!-- Modal -->
+        <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">执行结果</h4>
+                    </div>
+                    <div class="modal-body" style="margin: 0 20px; padding: 0px">
+                        <p id="result" style="font-size: 16px"></p>
+                        <p id="reasons"></p>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            传参：
+                            <textarea rows="6" class="form-control" id="jsondata" name="jsondata" readonly></textarea>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(jsondata.value, false, 'jsondata')">格式化
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(jsondata.value, true, 'jsondata')">压缩
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="decodeUnicode(jsondata.value, 'jsondata')">unicode转中文
+                            </button>
+                        </div>
+                        <div class="col-lg-6">
+                            期望结果：
+                            <textarea rows="12" class="form-control" id="expectedResults" name="expectedResults" readonly></textarea>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(expectedResults.value, false, 'expectedResults')">格式化
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(expectedResults.value, true, 'expectedResults')">压缩
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="decodeUnicode(expectedResults.value, 'expectedResults')">unicode转中文
+                            </button>
+                        </div>
+                        <div class="col-lg-6">
+                            实际返回结果：
+                            <textarea rows="12" class="form-control" id="actualResults" name="actualResults" readonly></textarea>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(actualResults.value, false, 'actualResults')">格式化
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="formatjson(actualResults.value, true, 'actualResults')">压缩
+                            </button>
+                            <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                    onclick="decodeUnicode(actualResults.value, 'actualResults')">unicode转中文
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: hidden;margin: 0">
+                        <button data-dismiss="modal" class="btn btn-default" type="button" style="height: auto; margin: 5px;">
+                            关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- modal -->
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/caselist.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jsonformat.js') }}"></script>
+{% endblock %}

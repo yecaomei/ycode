@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block title %}用户详情{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block usermanage %}
+    <li class="menu-list nav-active"><a href=""><span>用户管理</span></a>
+{% endblock %}
+{% block userlist %}
+    <li class="active"><a href="{{ url_for('.userlist') }}">用户列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>用户详情</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">用户管理</a>
+        </li>
+        <li>
+            <a href="{{ url_for('.userlist') }}">用户列表</a>
+        </li>
+        <li class="active">用户详情</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">用户详情</header>
+            <div class="panel-body">
+                <div class="adv-table">
+                    <div class="profile-pic text-center" style="float: left; width: 300px;">
+                        {% if users_info.images %}
+                            <img alt="" src="{{ url_for('static', filename=users_info.images) }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/photos/noimage.png') }}" alt="" />
+                        {% endif %}
+                    </div>
+                    <ul class="p-info" style="width: 400px; float: left;">
+                        <li>
+                            <div class="title">用户名</div>
+                            <div class="desk">{{ users_info.username }}</div>
+                        </li>
+                        <li>
+                            <div class="title">邮箱</div>
+                            <div class="desk">{{ users_info.email }}</div>
+                        </li>
+                        <li>
+                            <div class="title">手机号</div>
+                            <div class="desk">{% if users_info.telephone %}{{ users_info.telephone }}{%else%}暂无{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">角色权限</div>
+                            <div class="desk">{% if users_info.role_id %}{{ getrole(users_info.role_id) }}{%else%}暂无{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">生效状态</div>
+                            <div class="desk">{% if users_info.status == 1 %}正常{% else %}无效{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">注册时间</div>
+                            <div class="desk">{{ users_info.regtime }}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后修改时间</div>
+                            <div class="desk">{% if users_info.modifytime %}{{ users_info.modifytime }}{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后修改人</div>
+                            <div class="desk">{% if users_info.lastmodifier %}{{ getusername(users_info.lastmodifier) }}{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title">最后登录时间</div>
+                            <div class="desk">{% if users_info.lastlogin %}{{ users_info.lastlogin }}{% endif %}</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+<script>
+        function edittestcaseprojectstatus(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '测试项目状态改为' + t + ' 吗？')) {
+                var data = {
+                    "id":id,
+                    "status":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.edittestcaseprojectstatus')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}
+{% block title %}测试项目列表{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testcasemanage %}
+    <li class="menu-list nav-active"><a href=""><span>功能测试用例管理</span></a>
+{% endblock %}
+{% block testcaseproject %}
+    <li class="active"><a href="{{ url_for('.testcaseprojectlist') }}">测试项目列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>测试项目列表</h3>
+    <ul class="breadcrumb">
+        <li>功能测试用例管理</li>
+        <li class="active">测试项目列表</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">测试项目列表</header>
+            <div class="panel-body">
+                <div class="adv-table">
+                    <table class="display table table-bordered table-striped" id="dynamic-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>测试项目名称</th>
+                            <th>生效状态</th>
+                            <th>项目描述</th>
+                            <th>最后修改人</th>
+                            <th>最后修改时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for project in project_info%}
+                        <tr class="gradeA">
+                            <td class="projectid">{{ project.id }}</td>
+                            <td>{{ project.projectname }}</td>
+                            <td class="center">
+                                <select class="form-control  m-bot15" onchange="edittestcaseprojectstatus($(this).val(), $(this).find('option:selected').text(),$(this).parent().siblings('.projectid').text())">
+                                    <option value="0" {% if project.status == 0 %} selected {% endif %}>无效</option>
+                                    <option value="1" {% if project.status == 1 %} selected {% endif %}>正常</option>
+                                </select>
+                            </td>
+                            <td>{{ project.note }}</td>
+                            <td class="center">{% if project.lastmodifier %}{{ project.user.username }}{% endif %}</td>
+                            <td class="center">{% if project.modifytime %}{{ project.modifytime }}{% endif %}</td>
+                            <td class="center"><a href="{{url_for('.edittestcaseproject', id=project.id)}}">编辑</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/dynamic_table_init.js') }}"></script>
+{% endblock %}

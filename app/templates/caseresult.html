@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block title %}用例执行结果{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testresultmanage %}
+    <li class="menu-list nav-active"><a href=""><span>测试结果管理</span></a>
+{% endblock %}
+{% block testresultlist %}
+    <li class="active"><a href="{{ url_for('.testresultlist') }}">测试结果列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>测试执行结果</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">测试结果管理</a>
+        </li>
+        <li> 测试结果列表 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">测试执行结果</header>
+            <div class="panel-body">
+                <div class="adv-table">
+                    <ul class="p-info" style="float: left;">
+                        <li>
+                            <div class="title" style="width: 150px;">执行结果ID：</div>
+                            <div>{{ caseresult.id }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">测试计划ID：</div>
+                            <div>{{ caseresult.testplan_id }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">执行批次：</div>
+                            <div>{{ caseresult.batchnumber }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">接口(ID)：</div>
+                            <div>{{ caseresult.apiname }}({{ caseresult.api_id }})</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">用例(ID)：</div>
+                            <div>{{ caseresult.case.casename }}({{ caseresult.case_id }})</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">执行结果：</div>
+                            <div>{% if caseresult.result ==1 %}<font color="green">成功</font>{% else %}<font color="red">失败</font>{% endif %}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">原因：</div>
+                            <div>{{ caseresult.reasons }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">前置用例执行结果：</div>
+                            <div class="title">
+                                {% if caseresult.beforeresult %}
+                                {% for id,name in beforeresult(caseresult.beforeresult).items() %}
+                                    <a  href="{{url_for('.caseresult', id=id)}}">{{ name }}</a><br>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">执行时间：</div>
+                            <div>{{ caseresult.createtime }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">执行人：</div>
+                            <div>{{ caseresult.user.username }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">请求方式：</div>
+                            <div>{{ caseresult.method }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">接口域名：</div>
+                            <div>{{ caseresult.domain }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">接口地址：</div>
+                            <div class="title">{{ caseresult.url }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">协议：</div>
+                            <div>{{ caseresult.protocol }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">传参方式：</div>
+                            <div>{{ caseresult.transmethod }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">前置用例：</div>
+                            <div>{{ caseresult.beforecase }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">请求头部：</div>
+                            <div class="title">
+                                <div class="col-lg-12">
+                                <textarea rows="6" class="form-control" id="requestheaders" name="requestheaders" readonly>{{ caseresult.requestheaders }}</textarea>
+                                <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                        onclick="formatjson(requestheaders.value, false, 'requestheaders')">格式化
+                                </button>
+                                <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                        onclick="formatjson(requestheaders.value, true, 'requestheaders')">压缩
+                                </button>
+                                <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                        onclick="decodeUnicode(requestheaders.value, 'requestheaders')">unicode转中文
+                                </button>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">body传参：</div>
+                            <div class="title">
+                                <div class="col-lg-12">
+                                    <textarea rows="6" class="form-control" id="jsondata" name="jsondata" readonly>{{ caseresult.jsondata }}</textarea>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(jsondata.value, false, 'jsondata')">格式化
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(jsondata.value, true, 'jsondata')">压缩
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="decodeUnicode(jsondata.value, 'jsondata')">unicode转中文
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">结果对比方式：</div>
+                            <div>{{ caseresult.comparemethod }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">期望结果：</div>
+                            <div class="title">
+                                <div class="col-lg-12">
+                                    <textarea rows="6" class="form-control" id="expectedResults" name="expectedResults" readonly>{{ caseresult.expectedResults }}</textarea>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(expectedResults.value, false, 'expectedResults')">格式化
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(expectedResults.value, true, 'expectedResults')">压缩
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="decodeUnicode(expectedResults.value, 'expectedResults')">unicode转中文
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">返回结果状态：</div>
+                            <div>{{ caseresult.status_code }}</div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">返回结果头部：</div>
+                            <div class="title">
+                                <div class="col-lg-12">
+                                    <textarea rows="6" class="form-control" id="reponseheaders" name="reponseheaders" readonly>{{ caseresult.reponseheaders }}</textarea>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(reponseheaders.value, false, 'reponseheaders')">格式化
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(reponseheaders.value, true, 'reponseheaders')">压缩
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="decodeUnicode(reponseheaders.value, 'reponseheaders')">unicode转中文
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">实际结果：</div>
+                            <div class="title">
+                                <div class="col-lg-12">
+                                    <textarea rows="6" class="form-control" id="actualResults" name="actualResults" readonly>{{ caseresult.actualResults }}</textarea>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(actualResults.value, false, 'actualResults')">格式化
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="formatjson(actualResults.value, true, 'actualResults')">压缩
+                                    </button>
+                                    <button class="btn btn-primary" style="height: auto;margin: 3px" type="button"
+                                            onclick="decodeUnicode(actualResults.value, 'actualResults')">unicode转中文
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="title" style="width: 150px;">用例描述：</div>
+                            <div>{{ caseresult.note }}</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jsonformat.js') }}"></script>
+{% endblock %}

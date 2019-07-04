@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+    <script>
+        function editapistatus(v, t, id) {
+            if (confirm('您确定要把ID：' + id + '接口的状态改为' + t + ' 吗？')) {
+                var data = {
+                    "id":id,
+                    "status":v
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.editapistatus')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function lockapi(id) {
+            if (confirm('您确定要把ID：' + id + '接口锁定吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.lockapi')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function unlockapi(id) {
+            if (confirm('您确定要把ID：' + id + '接口解锁吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.unlockapi')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+        function exeapi(id) {
+            if (confirm('您确定要执行ID：' + id + '接口的测试用例吗？')) {
+                var data = {
+                    "id":id
+                }
+                $.ajax({
+                    type:'POST',
+                    url:"{{url_for('.exeapi')}}",
+                    data:JSON.stringify(data),
+                    contentType:'application/json; charset=UTF-8',
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data)
+                        location.reload();
+                    },
+                    error: function (xhr, type) {
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}
+{% block title %}接口列表{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block apimanage %}
+    <li class="menu-list nav-active"><a href=""><span>接口管理</span></a>
+{% endblock %}
+{% block apilist %}
+    <li class="active"><a href="{{ url_for('.apilist') }}"> 接口列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>接口列表</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">接口管理</a>
+        </li>
+        <li class="active"> 接口列表 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+        <div class="col-sm-12">
+        <section class="panel">
+        <header class="panel-heading">接口列表</header>
+        <div class="panel-body">
+        <div class="adv-table">
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>接口ID</th>
+            <th>所属项目</th>
+            <th>所属模块</th>
+            <th>所属版本</th>
+            <th>接口名称</th>
+            <th>请求方式</th>
+            <th>接口来源/地址</th>
+            <th>接口状态</th>
+            <th>锁定状态/锁定人</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+            <th hidden>协议</th>
+            <th hidden>传参方式</th>
+            <th hidden>传参</th>
+            <th hidden>接口描述</th>
+            <th hidden>创建时间</th>
+            <th hidden>最后修改人</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for api in apilist%}
+        <tr class="gradeA">
+            <td class="apiId">{{ api[0].id }}</td>
+            <td>{{ api[0].module.project.projectname }}</td>
+            <td>{{ api[0].module.modulename }}</td>
+            <td>{{ api[0].version.versionname }}</td>
+            <td>{{ api[0].apiname }}</td>
+            <td>{{ api[0].method }}</td>
+            <td>{{ company[api[0].domain] }}<br>{{ api[0].url }}</td>
+            <td>
+                <select class="form-control  m-bot15" onchange="editapistatus($(this).val(), $(this).find('option:selected').text(), $(this).parent().siblings('.apiId').text())">
+                    {% for k,v in apistatus.items()%}
+                    <option value="{{ k }}" {% if k== api[0].status %} selected {% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>{% if api[0].locked== 0 %} 未锁定 <br><button class="btn btn-info" type="button" style="width: auto;height: auto;padding:6px 12px;" onclick="lockapi($(this).parent().siblings('.apiId').text())">锁定</button>{% else %} 已锁定 / {{ api[0].user.username }}{% endif %}{% if api[0].locked == 1 and api[0].locker== user.id %}<br><button class="btn btn-success" type="button" style="width: auto;height: auto;padding:6px 12px;" onclick="unlockapi($(this).parent().siblings('.apiId').text())">解锁</button>{% endif %}</td>
+            <td>{{ api[0].modifytime }}</td>
+            <td><button class="btn btn-danger" type="button" style="width: auto;height: auto;padding:6px 8px;" onclick="exeapi($(this).parent().siblings('.apiId').text())">执行用例</button><br>{% if (api[0].locked == 1 and api[0].locker== user.id) or api[0].locked == 0 %}<a href="{{url_for('.editapi', id=api[0].id)}}">编辑</a>&nbsp;&nbsp;/&nbsp;&nbsp;{% endif %}<a href="{{url_for('.apicaselist', id=api[0].id)}}">查看用例</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a href="{{url_for('.addapicase', id=api[0].id)}}">添加用例</a></td>
+            <td hidden>{{ api[0].protocol }}</td>
+            <td hidden>{{ api[0].transmethod }}</td>
+            <td hidden>{{ api[0].jsondata }}</td>
+            <td hidden>{{ api[0].note }}</td>
+            <td hidden>{{ api[0].createtime }}</td>
+            <td hidden>{{ api[1].username }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+        </section>
+        </div>
+        </div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/apilist.js') }}"></script>
+{% endblock %}

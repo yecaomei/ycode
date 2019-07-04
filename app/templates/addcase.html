@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--icheck-->
+    <link href="{{ url_for('static', filename='js/iCheck/skins/minimal/minimal.css') }}" rel="stylesheet">
+<script>
+    function selectproject() {
+        var projectname = $("#projectname").val();
+        var data = {
+            "project_id": projectname,
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selectproject')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var modulename = document.getElementById("modulename");
+                var versionname = document.getElementById("versionname");
+                var api_id = document.getElementById("api_id");
+                modulename.options.length = 0;
+                versionname.options.length = 0;
+                if (Object.keys(data["modulelist"]).length < 1) {
+                    modulename.add(new Option("请选择所属模块", 0));
+                } else {
+                    modulename.add(new Option("请选择所属模块", 0));
+                    for (var key in data["modulelist"]) {
+                        modulename.add(new Option(data["modulelist"][key], key));
+                    }
+                }
+                if (Object.keys(data["versionlist"]).length < 1) {
+                    versionname.add(new Option("请选择所属版本", 0));
+                } else {
+                    versionname.add(new Option("请选择所属版本", 0));
+                    versionlist = data["versionlist"];
+                    var len = versionlist.length;
+                    for (var i=0; i<len; i++) {
+                        versionname.add(new Option(versionlist[i]['versionname'],versionlist[i]['id']));
+                    }
+                }
+                api_id.options.length = 0;
+                api_id.add(new Option("请选择所属接口", 0));
+                var jsondata = document.getElementById("jsondata");
+                jsondata.value = '';
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function changemodule() {
+        var projectname = $("#projectname").val();
+        var modulename = $("#modulename").val();
+        var versionname = $("#versionname").val();
+        var data = {
+            "project_id": projectname,
+            "module_id": modulename,
+            "version_id": versionname
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.changemodule')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var api_id = document.getElementById("api_id");
+                api_id.options.length = 0;
+                api_id.add(new Option("请选择所属接口", 0));
+                for (var key in data) {
+                    api_id.add(new Option("接口ID(" + key + ")---" + data[key], key));
+                }
+                var jsondata = document.getElementById("jsondata");
+                jsondata.value = '';
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function changeversion() {
+        var projectname = $("#projectname").val();
+        var modulename = $("#modulename").val();
+        var versionname = $("#versionname").val();
+        var data = {
+            "project_id": projectname,
+            "module_id": modulename,
+            "version_id": versionname
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.changeversion')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var api_id = document.getElementById("api_id");
+                api_id.options.length = 0;
+                api_id.add(new Option("请选择所属接口", 0));
+                for (var key in data) {
+                    api_id.add(new Option("接口ID(" + key + ")---" + data[key], key));
+                }
+                var jsondata = document.getElementById("jsondata");
+                jsondata.value = '';
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+    function selectapi() {
+        var api_id = $("#api_id").val();
+        var data = {
+            "api_id": api_id,
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('.selectapi')}}",
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var jsondata = document.getElementById("jsondata");
+                jsondata.value = data;
+            },
+            error: function (xhr, type) {
+            }
+        });
+    }
+</script>
+{% endblock %}
+{% block title %}添加用例{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block casemanage %}
+    <li class="menu-list nav-active"><a href=""><span>用例管理</span></a>
+{% endblock %}
+{% block addcase %}
+    <li class="active"><a href="{{ url_for('.addcase') }}">添加用例</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>添加用例</h3>
+    <ul class="breadcrumb">
+        <li>用例管理</li>
+        <li class="active">添加用例</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">添加用例</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+            <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+            {% endfor %}
+                <form id="signupForm" class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.projectname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.projectname() }}
+                            {% for err in form.errors.projectname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.modulename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.modulename() }}
+                            {% for err in form.errors.modulename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.versionname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.versionname() }}
+                            {% for err in form.errors.versionname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.api_id.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.api_id() }}
+                            {% for err in form.errors.api_id %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.casename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.casename() }}
+                            {% for err in form.errors.casename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.beforecase.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.beforecase() }}
+                            <label class="text-primary">注：格式为  用例ID:参数,参数,...|用例ID:参数,参数,...   如：3:carcode|4:carid,price</label>
+                            {% for err in form.errors.beforecase %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.jsondata.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.jsondata() }}
+                            {% for err in form.errors.jsondata %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(jsondata.value, false, 'jsondata')">格式化</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(jsondata.value, true, 'jsondata')">压缩</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="encodeUnicode(jsondata.value, 'jsondata')">中文转unicode</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="decodeUnicode(jsondata.value, 'jsondata')">unicode转中文</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.comparemethod.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.comparemethod() }}
+                            {% for err in form.errors.comparemethod %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.expectedResults.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.expectedResults() }}
+                            <label class="text-primary">
+                                注：<br>
+                                结果对比方式为相同时，格式为json
+                                <br>
+                                结果对比方式为相同时，格式为json,含有[]时，需按顺序
+                                <br>
+                                结果对比方式为统计数量、字段值比对时，格式为  统计字段名:个数|统计字段名:个数...   如：carcode:3|carid:4|price:5
+                                <br>
+                                结果对比方式为期望字段存在时，格式为：字段|字段...   如：carcode|carid|price
+                            </label>
+                            {% for err in form.errors.expectedResults %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(expectedResults.value, false, 'expectedResults')">格式化</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(expectedResults.value, true, 'expectedResults')">压缩</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="encodeUnicode(expectedResults.value, 'expectedResults')">中文转unicode</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="decodeUnicode(expectedResults.value, 'expectedResults')">unicode转中文</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.note.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.note() }}
+                            {% for err in form.errors.note %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-offset-5 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--icheck -->
+    <script src="{{ url_for('static', filename='js/iCheck/jquery.icheck.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icheck-init.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/jsonformat.js') }}"></script>
+{% endblock %}

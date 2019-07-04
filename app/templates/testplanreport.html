@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--dynamic table-->
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_page.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/advanced-datatable/css/demo_table.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='js/data-tables/DT_bootstrap.css') }}" rel="stylesheet" />
+
+{% endblock %}
+{% block title %}测试计划执行报告{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block testresultmanage %}
+    <li class="menu-list nav-active"><a href=""><span>测试结果管理</span></a>
+{% endblock %}
+{% block testplanreport %}
+    <li class="active"><a href="{{ url_for('.testplanreportlist') }}"> 测试计划执行报告</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>测试计划执行报告</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">测试结果管理</a>
+        </li>
+        <li class="active"> 测试计划执行报告 </li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+        <div class="col-sm-12">
+        <section class="panel">
+        <header class="panel-heading">测试计划执行报告</header>
+        <div class="panel-body">
+        <div class="adv-table">
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>测试计划(ID)</th>
+            <th>执行批次</th>
+            <th>接口数量</th>
+            <th>用例数量</th>
+            <th>用例执行成功数</th>
+            <th>用例执行失败数</th>
+            <th>未执行接口数</th>
+            <th>未执行用例数</th>
+            <th>执行时间</th>
+            <th>执行人</th>
+            <th hidden>包含接口</th>
+            <th hidden>包含用例</th>
+            <th hidden>未执行接口</th>
+            <th hidden>未执行用例</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for testreport in testreportlist %}
+        <tr class="gradeA">
+            <td>{{ testreport.id }}</td>
+            <td>{{ testreport.testplan.planname }}({{ testreport.testplan_id }})</td>
+            <td>{% if testreport.batchnumber != '0' %}<a  href="{{url_for('.batchnumberresult', batchnumber=testreport.batchnumber)}}">{{ testreport.batchnumber }}</a>{% endif %}</td>
+            <td>{{ testreport.apicount }}</td>
+            <td>{{ testreport.casecount }}</td>
+            <td>{{ testreport.passedcount }}</td>
+            <td>{{ testreport.failedcount }}</td>
+            <td>{{ testreport.unexeapicount }}</td>
+            <td>{{ testreport.unexecasecount }}</td>
+            <td>{{ testreport.createtime }}</td>
+            <td>{{ testreport.user.username }}</td>
+            <td hidden>
+                {% if testreport.apis %}
+                    {% for id,name in apis(testreport.apis).items() %}
+                        <a href="{{url_for('.editapi', id=id)}}" target="_blank"> {{ name }}({{ id }})</a>、
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td hidden>
+                {% if testreport.cases %}
+                    {% for id,name in cases(testreport.cases).items() %}
+                        <a href="{{url_for('.editcase', id=id)}}" target="_blank"> {{ name }}({{ id }})</a>、
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td hidden>
+                {% if testreport.unexeapi %}
+                    {% for id,name in apis(testreport.unexeapi).items() %}
+                        <a href="{{url_for('.editapi', id=id)}}" target="_blank"> {{ name }}({{ id }})</a>、
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td hidden>
+                {% if testreport.unexecase %}
+                    {% for id,name in cases(testreport.unexecase).items() %}
+                        <a href="{{url_for('.editcase', id=id)}}" target="_blank"> {{ name }}({{ id }})</a>、
+                    {% endfor %}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+        </section>
+        </div>
+        </div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--dynamic table-->
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/advanced-datatable/js/jquery.dataTables.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/data-tables/DT_bootstrap.js') }}"></script>
+    <!--dynamic table initialization -->
+    <script src="{{ url_for('static', filename='js/testplanreport.js') }}"></script>
+{% endblock %}

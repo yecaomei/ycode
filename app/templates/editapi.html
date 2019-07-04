@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <!--icheck-->
+    <link href="{{ url_for('static', filename='js/iCheck/skins/minimal/minimal.css') }}" rel="stylesheet">
+<script>
+    function selectproject() {
+    var projectname = $("#projectname").val();
+    var data = {
+        "project_id": projectname,
+    }
+    $.ajax({
+        type: 'POST',
+        url: "{{url_for('.selectproject')}}",
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
+        success: function (data) {
+            console.log(data)
+            var modulename = document.getElementById("modulename");
+            var versionname = document.getElementById("versionname");
+            modulename.options.length = 0;
+            versionname.options.length = 0;
+            if (Object.keys(data["modulelist"]).length < 1) {
+                modulename.add(new Option("请选择所属模块", 0));
+            } else {
+                modulename.add(new Option("请选择所属模块", 0));
+                for (var key in data["modulelist"]) {
+                    modulename.add(new Option(data["modulelist"][key], key));
+                }
+            }
+            if (Object.keys(data["versionlist"]).length < 1) {
+                versionname.add(new Option("请选择所属版本", 0));
+            } else {
+                versionname.add(new Option("请选择所属版本", 0));
+                versionlist = data["versionlist"];
+                var len = versionlist.length;
+                for (var i=0; i<len; i++) {
+                    versionname.add(new Option(versionlist[i]['versionname'],versionlist[i]['id']));
+                }
+            }
+        },
+        error: function (xhr, type) {
+        }
+    });
+}
+</script>
+{% endblock %}
+{% block title %}编辑接口{% endblock %}
+{% block body %}
+    {{ super() }}
+{% endblock %}
+{% block sidebar %}
+    {{ super() }}
+{% endblock %}
+{% block apimanage %}
+    <li class="menu-list nav-active"><a href=""><span>接口管理</span></a>
+{% endblock %}
+{% block apilist %}
+    <li class="active"><a href="{{ url_for('.apilist') }}">接口列表</a></li>
+{% endblock %}
+{% block bread %}
+    <h3>编辑接口</h3>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">接口管理</a>
+        </li>
+        <li>
+            <a href="{{ url_for('.apilist') }}">接口列表</a>
+        </li>
+        <li class="active">编辑接口</li>
+    </ul>
+{% endblock %}
+{% block wrapper %}
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading">编辑接口</header>
+            <div class="panel-body">
+                {% for msg in get_flashed_messages() %}
+            <div class="alert alert-info" style="text-align: center">{{ msg }}</div>
+            {% endfor %}
+                <form id="signupForm" class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {{ form.projectname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.projectname() }}
+                            {% for err in form.errors.projectname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.modulename.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.modulename() }}
+                            {% for err in form.errors.modulename %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.versionname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.versionname() }}
+                            {% for err in form.errors.versionname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.apiname.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.apiname() }}
+                            {% for err in form.errors.apiname %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.method.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.method() }}
+                            {% for err in form.errors.method %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.domain.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.domain() }}
+                            {% for err in form.errors.domain %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.url.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.url() }}
+                            {% for err in form.errors.url %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.protocol.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-4">
+                            {{ form.protocol() }}
+                            {% for err in form.errors.protocol %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.transmethod.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-sm-6 icheck minimal">
+                            {% for tmethod in form.transmethod %}
+                            <div class="radio">
+                                {{ tmethod }}
+                                {{ tmethod.label }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                     {% for err in form.errors.transmethod %}
+                    <div class="form-group">
+                        <label class="col-lg-2 col-sm-2 control-label"> </label>
+                        <div class="col-lg-8">
+                            <label class="error">{{ err }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        {{ form.jsondata.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.jsondata() }}
+                            {% for err in form.errors.jsondata %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-3 col-lg-10">
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(jsondata.value, false, 'jsondata')">格式化</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="formatjson(jsondata.value, true, 'jsondata')">压缩</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="encodeUnicode(jsondata.value, 'jsondata')">中文转unicode</button>
+                            <button class="btn btn-primary" style="height: auto;" type="button" onclick="decodeUnicode(jsondata.value, 'jsondata')">unicode转中文</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.note.label(class="col-sm-2 control-label col-lg-2") }}
+                        <div class="col-lg-8">
+                            {{ form.note() }}
+                            {% for err in form.errors.note %}
+                            <label class="error">{{ err }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-offset-5 col-lg-10">
+                            <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block endjs %}
+    {{ super() }}
+    <!--icheck -->
+    <script src="{{ url_for('static', filename='js/iCheck/jquery.icheck.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icheck-init.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/jsonformat.js') }}"></script>
+{% endblock %}
